@@ -1,70 +1,44 @@
 -- This file manages the main menu parts of the code. 
 -- I separated it here becuase it relies on nh-context and nh-keyboard and you may wish to replace it with your own method, maybe using ESX Menu Default? 
 
-
-
 -- The event called by the qtarget to open the menu
 RegisterNetEvent('qidentification:requestLicense')
 AddEventHandler('qidentification:requestLicense',function()
-
-	local sendMenu = {
-		{
-			id = 1,
-			header = "<h6>Life Invader</h6>",
-			txt = "",
-			params = { 
-				event = "fakeevent",
-				args = {}
-			}
-		}
-	}
-
-	-- loop through identification data defined in config.lua and add options for each entry
-	for i=1,#Config.IdentificationData,1 do 
-		data = Config.IdentificationData[i]
-		print(ESX.DumpTable(data))
-		table.insert(sendMenu,{
-			id = #sendMenu + 1,
-			header = "<span class='target-icon'><i class='fa-solid fa-id-card fa-fw'></i></span> Request "..data.label,
-			txt = "$"..data.cost,
-			params = { 
-				event = "qidentification:applyForLicense",
-				args = {
-					item = data.item
-				}
-			}
-		})
-	end
-
-	-- not necessary as you can hit "escape" to leave the nh-context menu, but I define a cancel button because it looks nice and makes sense from a user experience perspective
-	table.insert(sendMenu,
-	{
-		id = 99,
-		header = "<span class='target-icon'><i class='fa-solid fa-circle-xmark fa-fw'></i></span> Cancel",
-		txt = "",
-		params = {
-			event = "qidentification:cancel",
+	lib.registerContext({
+		id = 'RequestLicense',
+		title = 'Request a License',
+		menu = 'requestLicense',
+		options = {
+			['ID Card'] = {
+                description = 'Request a ID Card',
+                arrow = true,
+                event = 'qidentification:applyForLicense',
+                args = {value1 = 'identification', value2 = 500}
+            },
+			['Drivers License'] = {
+                description = 'Request a Drivers License',
+                arrow = true,
+                event = 'qidentification:applyForLicense',
+                args = {value1 = 'drivers_license', value2 = 1500}
+            },
+			['Firearms License'] = {
+                description = 'Request a Firearms License',
+                arrow = true,
+                event = 'qidentification:applyForLicense',
+				args = {value1 = 'firearms_license', value2 = 2500}
+            }
 		}
 	})
-
-	-- actually trigger the menu event 
-	TriggerEvent('nh-context:sendMenu', sendMenu)
+	lib.showContext('RequestLicense')
 end)
 
 
 -- the event that handles applying for license
 RegisterNetEvent('qidentification:applyForLicense')
 AddEventHandler('qidentification:applyForLicense',function(data)
-	local identificationData = nil
+	local identificationData = data.value1
+	local identificationDataPrice = data.value2
 	local mugshotURL = nil
-
-	-- Loop through identificationdata and match item and set a variable for future use
-	for k,v in pairs(Config.IdentificationData) do 
-		if v.item == data.item then 
-			identificationData = v
-			break
-		end
-	end
 
 	if Config.CustomMugshots then 
 		local data = exports.ox_inventory:Keyboard('Custom Mugshot URL (Leave blank for default)', {'Direct Image URL (link foto)'})
@@ -86,5 +60,45 @@ AddEventHandler('qidentification:applyForLicense',function(data)
 			Citizen.Await(p)		
 		end
 	end 
-	TriggerServerEvent('qidentification:server:payForLicense',identificationData,mugshotURL)
+	local hasCard = exports.ox_inventory:Search('count', identificationData)
+	if identificationData ~= 'identification' then
+		if identificationData == 'firearms_license' then identificationData = 'weapon' end
+		if identificationData == 'drivers_license' then identificationData = 'drive' end
+		ESX.TriggerServerCallback('esx_license:checkLicense', function(hasLicense)
+			if hasLicense then
+				if identificationData == 'weapon' then identificationData = 'firearms_license'  end
+				if identificationData == 'drive' then identificationData = 'drivers_license' end
+					
+				if hasCard >= 1 then
+					exports['t-notify']:Custom({
+						style  =  'error',
+						duration  =  5000,
+						message  =  'You already have an existing card on you.',
+						sound  =  true
+					})
+				else
+					TriggerServerEvent('qidentification:server:payForLicense',identificationData,identificationDataPrice,mugshotURL) 
+				end
+			else
+				exports['t-notify']:Custom({
+					style  =  'error',
+					duration  =  5000,
+					message  =  'Missing License, go get it',
+					sound  =  true
+				})
+			end
+		end, GetPlayerServerId(PlayerId()), identificationData)
+		--
+	else
+		if hasCard >= 1 then
+			exports['t-notify']:Custom({
+				style  =  'error',
+				duration  =  5000,
+				message  =  'You already own a ID card',
+				sound  =  true
+			})
+		else
+			TriggerServerEvent('qidentification:server:payForLicense',identificationData,identificationDataPrice,mugshotURL)
+		end
+	end
 end)
