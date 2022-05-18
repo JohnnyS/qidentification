@@ -1,11 +1,11 @@
-#My Fork
+# My Fork
 
 Adds ox_lib context menu to the menu instead of nh context. Removed getting license cause you can spam database with multiple licenses when you purchase one causing duplicated. Added a check for the item so you cant get more than one card to avoid idiots being dumb. 
 
 
 
 
-#Original ReadMe
+# Original ReadMe
 
 # qIdentification
 # All credits goes to [Noms](https://github.com/OfficialNoms) for creating this script first.
