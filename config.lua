@@ -4,10 +4,10 @@ Config.DistanceShowID = 2.5
 -- xPlayer variable that stores your player's "identification number" - for us it's identifier, you might store it as 'citizenid' or even 'slot'.
 Config.CitizenID = 'identifier' -- if you use 'identifier' you can check this link https://forum.cfx.re/t/qidentification-a-free-id-card-resource/4024670/20?u=katoteki
 -- time in SECONDS to enforce a cooldown between attempts to show your ID card to people around you
-Config.ShowIDCooldown = 30 
+Config.ShowIDCooldown = 5 
 -- The item you use for your physical currency
 Config.MoneyItem = 'money' -- or 'cash' or whatever you use
-Config.CustomMugshots = true -- for custom url, you can put your link for img
+Config.CustomMugshots = false -- for custom url, you can put your link for img
 
 Config.MugshotScriptName = "MugShotBase64" -- mugshot or MugShotBase64
 
@@ -18,17 +18,17 @@ Config.IdentificationData = {
 	{
 		label = "ID Card",
 		item = 'identification',
-		cost = 500,
+		cost = 3000,
 	},
 	{
 		label = "Drivers License",
 		item = 'drivers_license',
-		cost = 1500,
+		cost = 5000,
 	},
 	{
 		label = "Firearms License",
 		item = 'firearms_license',
-		cost = 2500,
+		cost = 5000,
 	},
 }
 --- NPC STUFF
