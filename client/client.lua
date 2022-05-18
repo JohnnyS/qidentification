@@ -33,7 +33,7 @@ AddEventHandler('qidentification:showID', function(item)
 		if #playersInArea > 0 then 
 			local Playerinareaid = {} -- Probably a better way of doing this, feel free to fix this :) -PERPGamer
 			for i = 1, #playersInArea do
-				table.insert(Playerinareaid, GetPlayerServerId(playersInArea[i]))
+				table.insert(Playerinareaid, GetPlayerServerId(NetworkGetPlayerIndexFromPed(playersInArea[i])))
 			end
 			TriggerServerEvent('qidentification:server:showID',item,Playerinareaid)
 			TriggerEvent('qidentification:openID',item)
@@ -53,8 +53,8 @@ end)
 -- Event to show your ID to nearby players
 RegisterNetEvent('qidentification:openID')
 AddEventHandler('qidentification:openID', function(item)
-	print("opening ID")
-	print(LocalPlayer.state.idvisible)
+	--print("opening ID")
+	--print(LocalPlayer.state.idvisible)
 	if LocalPlayer.state.idvisible == nil or not LocalPlayer.state.idvisible then 
 		TriggerEvent('qidentification:showUI',item)
 	end 
@@ -119,7 +119,7 @@ if Config.EnableLicenseBlip then
 				
 				SetBlipSprite (blip, 483)
 				SetBlipDisplay(blip, 4)
-				SetBlipScale  (blip, 0.8)
+				SetBlipScale  (blip, 0.9)
 				SetBlipColour (blip, 17)
 				SetBlipAsShortRange(blip, true)
 				
