@@ -5,7 +5,7 @@ description 'Identification cards script built to work with linden_inventory'
 
 author 'Noms'
 game 'gta5'
-
+lua54 'yes'
 
 ui_page 'html/index.html'
 
@@ -17,6 +17,7 @@ dependencies {
 
 shared_scripts {
 	'@es_extended/imports.lua',
+	'@ox_lib/init.lua',
 	'config.lua'
 }
 
